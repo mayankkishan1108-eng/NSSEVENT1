@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Page not found{% endblock %}
+{% block breadcrumb %}Page not found{% endblock %}
+{% block content %}<section class="not-found panel"><span class="not-found-number">404</span><p class="eyebrow">THIS PAGE HAS MOVED ON</p><h1>Let's get you<br><em>back to the work.</em></h1><a class="button button-dark" href="{{ url_for('dashboard') }}">Return to overview <svg><use href="#i-arrow"/></svg></a></section>{% endblock %}

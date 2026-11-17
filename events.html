@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block breadcrumb %}Events{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow"><span class="eyebrow-line"></span> PLAN · COORDINATE · SHOW UP</p><h1>Events <em>calendar</em></h1><p class="heading-copy">Keep every service activity moving, from first briefing to final attendance.</p></div><a class="button button-dark" href="#new-event"><svg><use href="#i-plus"/></svg><span>New event</span></a></section>
+<section class="toolbar panel"><div class="toolbar-copy"><strong>{{ events|length }} <span>activities</span></strong><small>across the campus unit</small></div><form class="filter-form" method="get" action="{{ url_for('events') }}"><label class="search-box"><svg><use href="#i-search"/></svg><input type="search" name="q" value="{{ search }}" placeholder="Search events, places…" aria-label="Search events"></label><label class="select-wrap"><span class="sr-only">Filter by status</span><select name="status"><option value="">All statuses</option>{% for status in ['Open', 'Planned', 'Completed', 'Cancelled'] %}<option value="{{ status }}" {{ 'selected' if status_filter == status else '' }}>{{ status }}</option>{% endfor %}</select></label><button class="button button-outline button-small" type="submit">Apply</button>{% if search or status_filter %}<a class="clear-filter" href="{{ url_for('events') }}">Clear</a>{% endif %}</form></section>
+<section class="table-panel panel">
+  <div class="table-caption"><div><p class="eyebrow">PROGRAMME REGISTER</p><h2>All activities</h2></div><span class="caption-note">Dates shown in local campus time</span></div>
+  <div class="table-scroll"><table class="data-table"><thead><tr><th>Event / category</th><th>Date &amp; time</th><th>Venue</th><th>Coordinator</th><th>Volunteers</th><th>Status</th><th><span class="sr-only">Open</span></th></tr></thead><tbody>
+  {% for event in events %}<tr>
+    <td><a class="table-primary" href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a><span class="table-secondary">{{ event.category }}</span></td>
+    <td><strong class="table-date">{{ event.event_date|pretty_date }}</strong><span class="table-secondary">{{ event.event_time }}</span></td>
+    <td>{{ event.venue }}</td><td>{{ event.coordinator }}</td>
+    <td><div class="mini-progress"><span>{{ event.registered }} / {{ event.capacity }}</span><i><b style="width: {{ [event.registered / event.capacity * 100, 100]|min|int }}%"></b></i></div></td>
+    <td><span class="status-pill status-{{ event.status|lower|replace(' ', '-') }}"><i></i>{{ event.status }}</span></td>
+    <td><a class="icon-link" href="{{ url_for('event_detail', event_id=event.id) }}" aria-label="Open {{ event.title }}"><svg><use href="#i-arrow"/></svg></a></td>
+  </tr>{% else %}<tr><td colspan="7"><div class="table-empty"><span class="empty-mark">—</span><strong>No activities match this view.</strong><span>Try a different search or add an event.</span></div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<details class="create-panel panel" id="new-event" {% if request.args.get('create') %}open{% endif %}><summary><span class="summary-icon"><svg><use href="#i-plus"/></svg></span><span><strong>Plan a new event</strong><small>Set the basics now. You can register volunteers and record attendance next.</small></span><span class="summary-action">Open form <span>＋</span></span></summary>
+  <form class="form-grid" method="post" action="{{ url_for('events') }}">
+    <label class="field field-wide"><span>Event name <b>*</b></span><input name="title" required maxlength="240" placeholder="e.g. Campus tree-planting morning"></label>
+    <label class="field"><span>Category <b>*</b></span><select name="category" required><option value="">Choose a category</option>{% for item in ['Community service', 'Education', 'Environment', 'Health', 'Disaster response', 'Other'] %}<option>{{ item }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Coordinator <b>*</b></span><select name="coordinator" required><option value="">Choose a volunteer</option>{% for person in coordinators %}<option>{{ person.name }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Date <b>*</b></span><input type="date" name="event_date" min="{{ today_iso }}" required></label>
+    <label class="field"><span>Start time <b>*</b></span><input type="time" name="event_time" required></label>
+    <label class="field field-wide"><span>Venue <b>*</b></span><input name="venue" required maxlength="240" placeholder="Building, room or community location"></label>
+    <label class="field"><span>Volunteer capacity <b>*</b></span><input type="number" name="capacity" min="1" max="9999" value="30" required></label>
+    <label class="field field-wide"><span>Brief description</span><textarea name="description" rows="3" maxlength="2000" placeholder="What will volunteers do? Include anything they should bring."></textarea></label>
+    <div class="form-actions"><span><b>*</b> Required fields</span><button class="button button-dark" type="submit">Save event <svg><use href="#i-arrow"/></svg></button></div>
+  </form>
+</details>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block breadcrumb %}Overview{% endblock %}
+{% block content %}
+<section class="page-heading dashboard-heading">
+  <div><p class="eyebrow"><span class="eyebrow-line"></span> UNIT BRIEFING · {{ today_iso|pretty_date('%d %B %Y')|upper }}</p><h1>Good morning,<br><em>service starts here.</em></h1><p class="heading-copy">A clear view of the people, programmes and work ahead for your campus unit.</p></div>
+  <a class="button button-dark" href="{{ url_for('events') }}#new-event"><svg><use href="#i-plus"/></svg><span>Plan an event</span></a>
+</section>
+
+<section class="metrics-grid" aria-label="Unit at a glance">
+  <article class="metric-card metric-featured"><div class="metric-top"><span>Registered volunteers</span><span class="metric-symbol"><svg><use href="#i-people"/></svg></span></div><strong class="metric-number">{{ '%02d'|format(stats.volunteers) }}</strong><div class="metric-foot"><span class="metric-bar"><i style="width:74%"></i></span><span>active directory</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span>Upcoming events</span><span class="metric-index">01</span></div><strong class="metric-number">{{ '%02d'|format(stats.upcoming) }}</strong><div class="metric-foot"><span class="metric-dot amber"></span><span>next 30 days</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span>Active camps</span><span class="metric-index">02</span></div><strong class="metric-number">{{ '%02d'|format(stats.camps) }}</strong><div class="metric-foot"><span class="metric-dot green"></span><span>recruiting or underway</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span>Service hours logged</span><span class="metric-index">03</span></div><strong class="metric-number">{{ '%02d'|format(stats.hours) }}<small>h</small></strong><div class="metric-foot"><span class="metric-dot coral"></span><span>from recorded attendance</span></div></article>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel upcoming-panel">
+    <div class="section-head"><div><p class="eyebrow">ON THE CALENDAR</p><h2>Coming up</h2></div><a class="text-link" href="{{ url_for('events') }}">All events <svg><use href="#i-arrow"/></svg></a></div>
+    {% if upcoming %}<div class="upcoming-list">
+      {% for event in upcoming %}<a class="upcoming-item" href="{{ url_for('event_detail', event_id=event.id) }}">
+        <div class="date-block"><strong>{{ event.event_date|pretty_date('%d') }}</strong><span>{{ event.event_date|pretty_date('%b')|upper }}</span></div>
+        <div class="upcoming-info"><div class="event-title-line"><h3>{{ event.title }}</h3><span class="category-label">{{ event.category }}</span></div><p>{{ event.event_time }} <span>·</span> {{ event.venue }}</p></div>
+        <div class="seat-count"><strong>{{ event.registered }}<small>/{{ event.capacity }}</small></strong><span>volunteers</span></div><svg class="row-arrow"><use href="#i-arrow"/></svg>
+      </a>{% endfor %}
+    </div>{% else %}<div class="empty-state"><span class="empty-mark">01</span><h3>A little room in the calendar.</h3><p>Add an event when your next service activity is ready.</p><a class="text-link" href="{{ url_for('events') }}#new-event">Plan the first one <svg><use href="#i-arrow"/></svg></a></div>{% endif %}
+  </section>
+  <aside class="panel focus-panel">
+    <div class="section-head"><div><p class="eyebrow">UNIT SNAPSHOT</p><h2>Work in motion</h2></div><span class="live-indicator">LIVE</span></div>
+    <p class="focus-intro">Your programmes create lasting change when good planning meets people who show up.</p>
+    <div class="snapshot-label"><span>Upcoming work</span><span>{{ categories|length }} areas</span></div>
+    {% if categories %}<div class="category-bars">{% set max_count = categories[0].total %}{% for category in categories %}<div class="category-row"><div class="category-copy"><span>{{ category.category }}</span><strong>{{ '%02d'|format(category.total) }}</strong></div><div class="bar-track"><i style="width: {{ (category.total / max_count * 100)|int }}%"></i></div></div>{% endfor %}</div>{% else %}<p class="muted-copy">No upcoming programme areas yet.</p>{% endif %}
+    <div class="focus-quote"><span class="quote-mark">“</span><p>The best way to find yourself<br>is to lose yourself in the service<br>of others.</p><small>— Mahatma Gandhi</small></div>
+  </aside>
+</div>
+<section class="closing-strip"><div class="closing-index">NSS <span>·</span> 1969</div><p>Small acts, done together, make a community.</p><a href="{{ url_for('reports') }}">View participation report <svg><use href="#i-arrow"/></svg></a></section>
+{% endblock %}
